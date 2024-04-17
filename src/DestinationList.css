@@ -1,0 +1,32 @@
+.destination-list {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .destination {
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 300px;
+  }
+  
+  .destination h3 {
+    margin-top: 0;
+  }
+  
+  .destination img {
+    width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+  }
+  
+  .destination ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .destination li {
+    margin-bottom: 10px;
+  }
+  
