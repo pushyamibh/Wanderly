@@ -239,7 +239,83 @@ def search():
     vlogs = list(mongo.db.vlogs.find(vlog_conditions))
 
     return json_util.dumps({'destinations': destinations, 'vlogs': vlogs}), 200
+#####################################################################################################
+@app.route("/selected-vlogs", methods=["POST"])
+def get_selected_vlogs():
+    try:
+        data = request.json
+        destname = data.get("destname")
+        
+        # Fetch vlogs related to the selected destination name
+        selected_vlogs = mongo.db.vlogs.find({"destname": destname})
+        
+        # Join vlogs and reviews collections to get ratings for each vlog
+        # Assuming there's a field called "vlog_id" in the reviews collection referencing the vlog
+        # This code is just a representation, adjust it according to your actual database schema
+        vlogs_with_ratings = []
+        for vlog in selected_vlogs:
+            vlog_id = vlog["vlog_id"]
+            reviews = mongo.db.reviews.find({"vlog_id": vlog_id})
+            ratings = [review["rating"] for review in reviews]
+            avg_rating = sum(ratings) / len(ratings) if ratings else 0
+            vlog["avg_rating"] = avg_rating
+            vlogs_with_ratings.append(vlog)
+        
+        # Sort vlogs by average rating
+        sorted_vlogs = sorted(vlogs_with_ratings, key=lambda x: x["avg_rating"], reverse=True)
+        
+        return json_util.dumps({"vlogs": sorted_vlogs}), 200
+    except Exception as e:
+        return json_util.dumps({"error": str(e)}), 500
     
+##########################################################################################################
+
+@app.route("/add-review", methods=["POST"])
+def add_review():
+    try:
+        data = request.json
+        # vlog_id = data.get("vlog")
+        username = data.get("username")
+        destname=data.get("destname")
+        rating = data.get("rating")
+        comment = data.get("comment")
+        
+        # Assuming you have a vlogs collection with "_id" as vlogId
+        vlog = mongo.db.vlogs.find_one({"username": username,"destname": destname})
+        if not vlog:
+            return jsonify({"error": "Vlog not found"}), 404
+        
+        # Add review to the reviews collection
+        review_id = mongo.db.reviews.insert_one({
+            "vlog_id": vlog["vlog_id"],
+            "username": username,
+            "rating": rating,
+            "comment": comment
+        }).inserted_id
+        
+        return json_util.dumps({"success": True, "review_id": str(review_id)}), 201
+    except Exception as e:
+        return json_util.dumps({"error": str(e)}), 500
+
+
+########################################################################################################
+@app.route('/getVlogs', methods=['POST'])
+def getVlogs():
+    data = request.json
+    username = data['username']
+    destination_name = data['destinationName']
+
+    # Find vlogs for the specific user and destination name
+    vlogs = list(mongo.db.vlogs.find({'username': username, 'destinationName': destination_name}))
+
+    if vlogs:
+        # Sort the vlogs by review ratings
+        vlogs.sort(key=lambda x: x['reviews'][0]['rating'], reverse=True)
+
+        return json_util.dumps({'vlogs': vlogs}), 200
+    else:
+        return json_util.dumps({'message': 'No vlogs found for the given user and destination'}), 404
+
 
 if __name__ == '__main__':
     app.run(debug=True,port=4343)
