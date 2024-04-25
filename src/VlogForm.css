@@ -1,86 +1,53 @@
-/* VlogForm.css */
-
-/* Container styling */
-.background {
-    width: 100%;
-    height: 100vh;
-    display: fixed;
-    left: 0;
-    top: 0;
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(34, 63, 139, 0.7) 100%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
 .container {
-    font-family: 'Dancing Script';
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+  width: 80%;
+  margin: 10px auto;
+  padding: 20px;
+  background-color: rgba(43, 118, 170, 1);
+  border-radius: 10px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
 
-  }
-  
-  
-  /* Heading styling */
-  h1 {
-    font-family: 'Dancing Script';
-    font-size: 24px;
-    margin-bottom: 20px;
-  }
-  
-  /* Form input styling */
-  label {
-    display: block;
-    margin-bottom: 8px;
-  }
-  
-  input[type="text"],
-  input[type="number"],
-  textarea {
-    width: calc(100% - 22px);
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
-  }
-  
-  /* Button styling */
-  button {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 16px;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-  
-  /* Card styling */
-  .card {
-    background-color: #ae1e1e;
-    border: 1px solid #250e82;
-    border-radius: 5px;
-    padding: 15px;
-    margin-right: 20px;
-    width: calc(50% - 30px); /* Half of the container width minus margins */
-    box-sizing: border-box;
-    display: inline-block;
-  }
-  
-  /* List styling */
-  ul {
-    padding: 0;
-  }
-  
-  /* Paragraph styling */
-  p {
-    margin: 0;
-  }
-  
+.container h1 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.container div {
+  margin-bottom: 15px;
+}
+
+.container label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.container input[type="text"],
+.container input[type="number"],
+.container textarea {
+  width: calc(100% - 20px);
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.container textarea {
+  resize: vertical;
+}
+
+.container button {
+  padding: 8px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.container button:hover {
+  background-color: #0056b3;
+}
+
+.container a button {
+  margin-left: 10px;
+}

@@ -53,7 +53,7 @@ export function Home() {
     }
   };
 
-  const handleAddReview = async (username,destname, rating, comment) => {
+  const handleAddReview = async (username, destname, rating, comment,index) => {
     try {
       if (!rating) {
         console.error('Please provide a rating');
@@ -71,25 +71,54 @@ export function Home() {
         rating,
         comment
       });
+      setVlogs(prevVlogs => {
+        const updatedVlogs = [...prevVlogs];
+        updatedVlogs[index].comment = '';
+        updatedVlogs[index].rating = 0;
+        return updatedVlogs;
+      });
+  
       setRating(0);
       setComment('');
       // Refresh vlogs after adding a review
+      if (!selectedDestName) {
+        await fetchVlogs();
+      } 
+      else {
       await handleBucketListItemClick(selectedDestName);
+      }
     } catch (error) {
       console.error('Error adding review:', error);
     }
   };
   // Function to handle change in rating input
-  const handleRatingChange = (event) => {
+  // const handleRatingChange = (event) => {
+  //   setRating(parseInt(event.target.value));
+  // };
+  const handleRatingChange = (event, index) => {
+    // const { value } = event.target;
     setRating(parseInt(event.target.value));
+    // setVlogs(prevVlogs => {
+    //   const updatedVlogs = [...prevVlogs];
+    //   updatedVlogs[index].rating = value;
+    //   return updatedVlogs;
+    // });
   };
 
   // Function to handle change in comment input
-  const handleCommentChange = (event) => {
+  // const handleCommentChange = (event) => {
+  //   setComment(event.target.value);
+  // };
+  const handleCommentChange = (event, index) => {
+    // const { value } = event.target;
     setComment(event.target.value);
+    // setVlogs(prevVlogs => {
+    //   const updatedVlogs = [...prevVlogs];
+    //   updatedVlogs[index].comment = value;
+    //   return updatedVlogs;
+    // });
   };
 
-    
 
   return (
     <div className="home-container">
@@ -111,10 +140,10 @@ export function Home() {
               <button type="button" className="Link-btn">
                 <Link to={`/add-bucketlist/${username}`} class="Link">Add Bucket List</Link>
               </button>
-              
+
             </div>
             <div className="bucket-list">
-            {bucketList.length > 0 ? (
+              {bucketList.length > 0 ? (
                 <ul className="List">
                   {bucketList.map(item => (
                     <li key={item.id}>
@@ -159,43 +188,54 @@ export function Home() {
             <div className="vlogs">
               <h3 class="side-heading">Vlogs</h3>
               <button type="button" className="Link-btn">
-              
+
                 <Link to={`/add-vlog/${username}`} class="Link">Add Vlog</Link>
-              
+
               </button>
-              {vlogs.map(vlog => (
-                <div className="vlog-card" key={vlog.id}>
-                  <img className="vlog-image" src={vlog.image_url} alt={vlog.title} />
+              {vlogs.map((vlog,index) => (
+                <div className="vlog-card" key={index}>
+                  <div className='first-half'>
+                    <img className="vlog-image" src={vlog.image_url} alt={vlog.title} />
+                    <textarea
+                      className="comment-box"
+                      placeholder="Add your comment..."
+                      value={vlog.comment}  // Use vlog.comment instead of comment
+                      onChange={(event) => handleCommentChange(event, index)}
+                    />
+                    <button
+                      className="comment-button"
+                      onClick={() => handleAddReview(vlog.username, vlog.destname, rating, comment,index)}>
+                      Add Comment
+                    </button>
+                  </div>
+
                   <div className='vlog-details'>
                     <h3>{vlog.title}</h3>
                     <h3>{vlog.username}</h3>
                     <h4>{vlog.destname} </h4>
                     <p>{vlog.description}</p>
-                    <div className="rating">Rating: {vlog.avg_rating}</div>
-                    <div className="stars">
-                      {[...Array(5)].map((star, index) => (
-                        <span key={index} className={index < vlog.avg_rating ? "filled-star" : "empty-star"}>★</span>
-                      ))}
-                    </div>
-                    <div>
-                      <input
-                        type="number"
-                        min="1"
-                        max="5"
-                        value={rating}
-                        onChange={handleRatingChange}
-                      />
-                    <textarea
-                      className="comment-box"
-                      placeholder="Add your comment..."
-                      value={comment}
-                      onChange={handleCommentChange}
-                    />
-                    <button
-                      className="comment-button"
-                      onClick={() => handleAddReview(vlog.username,vlog.destname,rating, comment)}>
-                      Add Comment
-                    </button>
+                    <div className='Rating'>
+                      <div className='rating-container-1'>
+                        <div className="rating-backend">Rating: {vlog.avg_rating}</div>
+                        <div className="stars">
+                          {[...Array(5)].map((star, index) => (
+                            <span key={index} className={index < vlog.avg_rating ? "filled-star" : "empty-star"}>★</span>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="rating-container-2">
+                        <span>Your Rating:</span>
+                        <input
+                          type="number"
+                          min="1"
+                          max="5"
+                          className='your-rating'
+                          value={vlog.rating}  // Use vlog.rating instead of rating
+                          onChange={(event) => handleRatingChange(event, index)} 
+                        />
+                      </div>
+
+
                     </div>
                     {/* Display other comments */}
                     <div className="other-comments">
@@ -209,10 +249,10 @@ export function Home() {
                           )}
                         </div>
                       ))}
+                    </div>
+
+                    {/* Add more details as needed */}
                   </div>
-                  
-                  {/* Add more details as needed */}
-                </div>
                 </div>
               ))}
 

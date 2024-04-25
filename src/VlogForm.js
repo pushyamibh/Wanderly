@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // Import Link
+import { Link , useParams} from 'react-router-dom'; // Import Link
 import axios from 'axios'; // Import Axios
 import "./VlogForm.css";
 const VlogForm = () => {
+  const { username } = useParams();
   const [formData, setFormData] = useState({
+    username:username,
     destinationName: '',
     title: '',
     description: '',
-    videoUrl: '',
-    imageUrl: '', // Add imageUrl field
+    imageUrl: '', 
     tag: '',
     budget: ''
   });
@@ -24,10 +25,10 @@ const VlogForm = () => {
         console.log(response.data); // Log response from the backend
         // Optionally, reset form data after successful submission
         setFormData({
+          username: username,
           destinationName: '',
           title: '',
           description: '',
-          videoUrl: '',
           imageUrl: '', // Reset imageUrl field
           tag: '',
           budget: ''
@@ -39,8 +40,8 @@ const VlogForm = () => {
   };
 
   return (
-    <div>
-      <h2>Add Vlog</h2>
+    <div className='container'>
+      <h1>Add Vlog</h1>
       <div>
         <label htmlFor="destinationName">Destination Name:</label>
         <input
@@ -69,17 +70,6 @@ const VlogForm = () => {
           id="description"
           name="description"
           value={formData.description}
-          onChange={handleInputChange}
-          required
-        />
-      </div>
-      <div>
-        <label htmlFor="videoUrl">Video URL:</label>
-        <input
-          type="text"
-          id="videoUrl"
-          name="videoUrl"
-          value={formData.videoUrl}
           onChange={handleInputChange}
           required
         />
@@ -122,5 +112,4 @@ const VlogForm = () => {
     </div>
   );
 };
-
 export default VlogForm;

@@ -5,6 +5,7 @@ import {Home} from './Home';
 import { AddBucketlist } from './AddBucketlist';
 import VlogForm from './VlogForm';
 import VlogSearch from './VlogSearch';
+import { Statistics } from './statistics';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/add-bucketlist/:username" element = {<AddBucketlist/>} />
         <Route path="/add-vlog/:username" element = {<VlogForm/>} />
         <Route path="/vlogsearch" element = {<VlogSearch/>} />
+        <Route path="/statistics" element = {<Statistics/>} />
       </Routes>
     </BrowserRouter>
      
