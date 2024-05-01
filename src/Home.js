@@ -64,7 +64,7 @@ export function Home() {
         return;
       }
 
-      // Assuming you have an API endpoint to add reviews
+      // To add reviews
       await axios.post('http://127.0.0.1:4343/add-review', {
         username,
         destname,
@@ -91,32 +91,18 @@ export function Home() {
       console.error('Error adding review:', error);
     }
   };
-  // Function to handle change in rating input
-  // const handleRatingChange = (event) => {
-  //   setRating(parseInt(event.target.value));
-  // };
+  
   const handleRatingChange = (event, index) => {
     // const { value } = event.target;
     setRating(parseInt(event.target.value));
-    // setVlogs(prevVlogs => {
-    //   const updatedVlogs = [...prevVlogs];
-    //   updatedVlogs[index].rating = value;
-    //   return updatedVlogs;
-    // });
+  
   };
 
   // Function to handle change in comment input
-  // const handleCommentChange = (event) => {
-  //   setComment(event.target.value);
-  // };
+ 
   const handleCommentChange = (event, index) => {
     // const { value } = event.target;
     setComment(event.target.value);
-    // setVlogs(prevVlogs => {
-    //   const updatedVlogs = [...prevVlogs];
-    //   updatedVlogs[index].comment = value;
-    //   return updatedVlogs;
-    // });
   };
 
 
@@ -126,6 +112,7 @@ export function Home() {
         <nav>
           <span className="Logo">Wanderly !</span>
           <span className="username">{username}</span>
+          
         </nav>
 
         <div class="Tagline-container">
@@ -160,27 +147,6 @@ export function Home() {
               ) : (
                 <span className="No-items">No Items Yet!</span>
               )}
-
-
-              {/* {
-                bucketList.length > 0
-                  ?
-                  <ul className='List'>
-                    {bucketList.map(item => (
-                      <li key={item.id}>{item.destname}</li>
-                    ))}
-                  </ul>
-                  :
-                  <span class="No-items">No Items Yet!</span>
-              } */}
-
-
-              {/* <input
-          type="text"
-          placeholder="Enter place"
-          onChange={(e) => setDestname(e.target.value)}
-        />
-        <button onClick={() => handleAddBucketListItem(destname)}>Add</button> */}
             </div>
 
           </div>

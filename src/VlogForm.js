@@ -23,13 +23,13 @@ const VlogForm = () => {
     axios.post('http://localhost:4343/vlogs', formData) // Send form data to the backend
       .then(response => {
         console.log(response.data); // Log response from the backend
-        // Optionally, reset form data after successful submission
+        // reset form data after successful submission
         setFormData({
           username: username,
           destinationName: '',
           title: '',
           description: '',
-          imageUrl: '', // Reset imageUrl field
+          imageUrl: '', 
           tag: '',
           budget: ''
         });

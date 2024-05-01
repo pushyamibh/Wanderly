@@ -6,6 +6,7 @@ import { AddBucketlist } from './AddBucketlist';
 import VlogForm from './VlogForm';
 import VlogSearch from './VlogSearch';
 import { Statistics } from './statistics';
+import UnfinishedActions from './UnfinishedActions';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/add-vlog/:username" element = {<VlogForm/>} />
         <Route path="/vlogsearch" element = {<VlogSearch/>} />
         <Route path="/statistics" element = {<Statistics/>} />
+        <Route path="/unfinishedActions" element = {<UnfinishedActions/>} />
       </Routes>
     </BrowserRouter>
      

@@ -13,7 +13,6 @@ mongo = PyMongo(app)
 @app.route('/users', methods=['GET'])
 def get_users():
     users = mongo.db.users.find()
-    #print(list(users))
     return json_util.dumps(list(users))
 
 @app.route('/users/<user_id>', methods=['GET'])
@@ -148,7 +147,7 @@ def add_vlog():
     vlog_data["image_url"]= data["imageUrl"]
     vlog_data["budget"]=data["budget"]
     tag_data["vlog_id"]=data["vlog_id"]
-    tag_data["tag"]=data["tag"]
+    tag_data["tag"]=data["tag"].lower()
     vlog_id = mongo.db.vlogs.insert_one(vlog_data).inserted_id
     
     final_res=mongo.db.tags.insert_one(tag_data).inserted_id
@@ -196,23 +195,9 @@ def add_tag():
     tag_id = mongo.db.tags.insert_one(data).inserted_id
     return json_util.dumps({'message': 'Tag added', 'tag_id': str(tag_id)}), 201
 
-# @app.route('/tags/<tag_id>', methods=['PUT'])
-# def update_tag(tag_id):
-#     data = request.json
-#     result = mongo.db.tags.update_one({'_id': ObjectId(tag_id)}, {'$set': data})
-#     if result.modified_count:
-#         return json_util.dumps({'message': 'Tag updated'}), 200
-#     else:
-#         return json_util.dumps({'message': 'Tag not found'}), 404
 
-# @app.route('/tags/<tag>', methods=['DELETE'])
-# def delete_tag(tag_id):
-#     result = mongo.db.tags.delete_one({'_id': ObjectId(tag_id)})
-#     if result.deleted_count:
-#         return json_util.dumps({'message': 'Tag deleted'}), 200
-#     else:
-#         return json_util.dumps({'message': 'Tag not found'}), 404
-#############################################################################
+################################Complex Query-1#############################################
+
 @app.route('/add-bucketlist/search', methods=['POST'])
 def search():
     data=request.json
@@ -230,7 +215,7 @@ def search():
     # Extract vlog IDs from tagged_vlogs
     vlog_ids = [tagged_vlog['vlog_id'] for tagged_vlog in tagged_vlogs]
 
-    # Define conditions for filtering destinations and vlogs
+    # filtering destinations and vlogs
     destination_conditions = []
     vlog_conditions = {'vlog_id': {'$in': vlog_ids}}
 
@@ -244,15 +229,17 @@ def search():
     if max_vlog_budget:
         vlog_conditions['budget'] = {'$lte': float(max_vlog_budget)}
 
-    # Construct the final query for destinations
+    # final query for destinations
     destination_query = {'$or': destination_conditions} if destination_conditions else {}
 
-    # Execute the queries
+    # queries execution
     destinations = list(mongo.db.destinations.find(destination_query))
     vlogs = list(mongo.db.vlogs.find(vlog_conditions))
 
     return json_util.dumps({'destinations': destinations, 'vlogs': vlogs}), 200
-#####################################################################################################
+
+########################################Complex Query -2#################################################
+
 @app.route("/selected-vlogs", methods=["POST"])
 def get_selected_vlogs():
     try:
@@ -263,8 +250,8 @@ def get_selected_vlogs():
         selected_vlogs = mongo.db.vlogs.find({"destname": destname})
         
         # Join vlogs and reviews collections to get ratings for each vlog
-        # Assuming there's a field called "vlog_id" in the reviews collection referencing the vlog
-        # This code is just a representation, adjust it according to your actual database schema
+        
+       
         vlogs_with_ratings = []
         for vlog in selected_vlogs:
             vlog_id = vlog["vlog_id"]
@@ -287,13 +274,14 @@ def get_selected_vlogs():
 def add_review():
     try:
         data = request.json
+        # print(data)
         # vlog_id = data.get("vlog")
         username = data.get("username")
         destname=data.get("destname")
         rating = data.get("rating")
         comment = data.get("comment")
         
-        # Assuming you have a vlogs collection with "_id" as vlogId
+        # vlogs collection with "_id" as vlogId
         vlog = mongo.db.vlogs.find_one({"username": username,"destname": destname})
         if not vlog:
             return jsonify({"error": "Vlog not found"}), 404
@@ -309,7 +297,7 @@ def add_review():
         return json_util.dumps({"success": True, "review_id": str(review_id)}), 201
     except Exception as e:
         return json_util.dumps({"error": str(e)}), 500
-###################################################################################################
+#############################################Complex Query -3################################################
 
 @app.route("/statistics", methods=["GET"])
 def get_statistics():
@@ -326,7 +314,7 @@ def get_statistics():
             vlog["avg_rating"] = avg_rating
             vlogs_collect.append(vlog)
         
-        # Example: Iterate through vlogs and calculate average rating
+        # Iterate through vlogs and calculate average rating
         total_rating = 0
         total_vlogs = 0
        
@@ -337,10 +325,10 @@ def get_statistics():
         
         average_rating = total_rating / total_vlogs if total_vlogs > 0 else 0
         
-        # Example: Get all users
+        #  Get all users
         users = mongo.db.users.find()
         
-        # Example: Count total number of vlogs created by each user
+        #Count total number of vlogs created by each user
         user_vlog_counts = {}
         for user in users:
             user_name = user["username"]
@@ -361,7 +349,7 @@ def get_statistics():
         return json_util.dumps({"error": str(e)}), 500
 
 
-########################################################################################################
+################################################Complex Query -4###############################################
 @app.route('/VlogSearch/search', methods=['POST'])
 def search_vlogs():
     data = request.json
@@ -369,7 +357,7 @@ def search_vlogs():
     tags = data.get('tagName')
     min_review_rating = int(data.get('minReviewRating'))
     destination_name = data.get('destinationName')
-    print(data)
+    
     try:
         # Match vlogs based on destination name
         vlogs = list(mongo.db.vlogs.find({'destname': destination_name}))
@@ -384,20 +372,26 @@ def search_vlogs():
         
         # Filter vlogs based on the provided tags and minimum review rating
         vlogs_with_tags_and_reviews = []
+        
         for vlog in vlogs:
             vlog_tags = [tag_v for tag_v in tagged_vlogs if tag_v['vlog_id'] == vlog["vlog_id"]]
             
             vlog_reviews = [review for review in reviews if review['vlog_id'] == vlog["vlog_id"]]
-            
+            print(vlog_tags)
+            print(vlog_reviews)
             for tag in vlog_tags:
+                flag=False
                 for vlo_r in vlog_reviews: 
                     
                     if tag['vlog_id'] == vlo_r["vlog_id"]:
-                        
+                        flag=True
                         vlog['tags'] = tag['tag']
                         vlog['rating'] = vlo_r['rating']
-                        
-                        vlogs_with_tags_and_reviews.append(vlog)
+                        ratings = [int(review["rating"] )for review in reviews]
+                        avg_rating = sum(ratings) / len(ratings) if ratings else 0
+                        vlog["avg_rating"] = round(avg_rating,1)
+                if flag:
+                    vlogs_with_tags_and_reviews.append(vlog)
         
         if vlogs_with_tags_and_reviews:
             return json_util.dumps({'vlogs': vlogs_with_tags_and_reviews}), 200
@@ -406,32 +400,103 @@ def search_vlogs():
     except Exception as e:
         return json_util.dumps({"error": str(e)}), 500
         
+##########################################Complex Query -5#######################################################
+
+@app.route("/getUnfinishedActions",methods=['GET'])
+def get_unfinished_actions():
+    try:
+        pipeline = [
+            # Match users who have added items to their bucket list
+            {"$lookup": {
+                "from": "bucket_list",
+                "localField": "username",
+                "foreignField": "username",
+                "as": "bucket_list"
+            }},
+            {"$match": {
+                "bucket_list": {"$exists": True, "$ne": []}  # Users with non-empty bucket lists
+            }},
+            # Lookup vlogs corresponding to items in the user's bucket list
+            {"$unwind": "$bucket_list"},
+            {"$lookup": {
+                "from": "vlogs",
+                "localField": "bucket_list.destname",
+                "foreignField": "destname",
+                "as": "vlogs"
+            }},
+            {"$addFields": {
+                "vlog_ids": {
+                    "$map": {
+                        "input": "$vlogs",
+                        "as": "vlog",
+                        "in": "$$vlog.vlog_id"
+                    }
+                }
+            }},
+            {"$lookup": {
+                "from": "reviews",
+                "let": {"bucket_vlog_id": {"$ifNull": ["$vlog_ids", []]},"username": "$username"},
+                "pipeline": [
+                    {"$match": {
+                        "$expr": {"$and": [
+                            {"$in": ["$vlog_id", "$$bucket_vlog_id"]},  # Match reviews for vlogs in user's bucket list
+                            {"$eq": ["$username", "$$username"]}  # Match reviews by the same user
+                        ]}
+                    }},
+                    {"$group": {
+                        "_id": "$username",  # Group by username to collect reviewed vlog IDs for each user
+                        "reviewed_vlog_ids": {"$addToSet": "$vlog_id"}  # Collect reviewed vlog IDs for each user
+                    }}
+                ],
+                "as": "user_reviews"
+            }},
+            {"$addFields": {
+                "reviewed_vlog_ids": {"$arrayElemAt": ["$user_reviews.reviewed_vlog_ids", 0]}  # Extract reviewed vlog IDs
+            }},
+            {"$project": {
+                "unfinished_actions": {
+                    "$setDifference": ["$vlog_ids", "$reviewed_vlog_ids"]  # Find vlog IDs not present in reviews
+                }
+            }},
+            {"$match": {
+                "unfinished_actions": {"$ne": [],"$ne": None}  # Filter users with unfinished actions
+            }},
+            {"$unwind": "$unfinished_actions"},
+            {"$lookup": {
+                "from": "vlogs",
+                "localField": "unfinished_actions",
+                "foreignField": "vlog_id",
+                "as": "unfinished_vlogs"
+            }},
+            {"$unwind": {
+                "path": "$unfinished_vlogs",
+                "preserveNullAndEmptyArrays": True
+            }},
+            {"$lookup": {
+                "from": "users",
+                "localField": "_id",
+                "foreignField": "_id",
+                "as": "user_info"
+            }},
+            {"$unwind": "$user_info"},
+            {"$group": {
+                "_id": "$_id",
+                "username": {"$first": "$user_info.username"},
+                "email": {"$first": "$user_info.email"},
+                "unfinished_actions": {"$push": "$unfinished_vlogs"}  # Collect all unfinished vlogs
+            }}
+     
+        ]
+
+        # Execute the aggregation pipeline
+        result = list(mongo.db.users.aggregate(pipeline))
+
+        # Return the result as JSON
+        return json_util.dumps(result), 200
+    except Exception as e:
+        return json_util.dumps({"error": str(e)}), 500
 
 
-# @app.route('/VlogSearch/search', methods=['POST'])
-# def search_vlogs():  # Use a unique name for the endpoint function
-#     data = request.json
-#     username = data.get('username')
-#     destination_name = data.get('destinationName')
-#     min_review_rating = data.get('minReviewRating')
-#     max_review_rating = data.get('maxReviewRating')
-
-#     user = mongo.db.users.find_one({'username': username})
-#     vlogs = list(mongo.db.vlogs.find({'destinationName': destination_name}))
-    
-#     reviews = list(mongo.db.reviews.find({'rating': {'$gte': min_review_rating, '$lte': max_review_rating}}))
-
-#     vlogs_with_reviews = []
-#     for vlog in vlogs:
-#         for review in reviews:
-#             if review['vlog_id'] == vlog['vlog_id']:
-#                 vlog['reviews'] = review
-#                 vlogs_with_reviews.append(vlog)
-
-#     if vlogs_with_reviews:
-#         return json_util.dumps({'user': user, 'vlogs': vlogs_with_reviews}), 200
-#     else:
-#         return json_util.dumps({'message': 'No data found for the given criteria'}), 404
 
 if __name__ == '__main__':
     app.run(debug=True,port=4343)

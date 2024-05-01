@@ -78,9 +78,9 @@ const VlogSearch = () => {
                 <div className="vlog-container" key={vlog.id}>
                   <img className="vlog-image" src={vlog.image_url} alt={vlog.title} />
                   <div className='vlog-details'>
-                  <h3>Vlog Title:{vlog.title} </h3>
-                  <h4>Destination name: {vlog.destname} </h4>
-                  <h3>Rating: {vlog.rating}</h3>
+                  <h3>{vlog.title} </h3>
+                  <h4>{vlog.destname} </h4>
+                  <h3>Rating: {vlog.avg_rating}</h3>
                   <p>{vlog.description}</p>
                   
                   </div>
