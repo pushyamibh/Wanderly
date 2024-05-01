@@ -10,17 +10,24 @@ nav {
     padding: 10px;
     justify-content: space-between;
   }
-canvas{
-    box-sizing: border-box;
-    display: block;
-    width: 100px;
-    height: 630.667px;
-    align-self: center;
-};
-.stats{
-    display: FLEX;
-    flex-direction: column;
+.stats {
+
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(360deg, rgba(43, 118, 170, 1) 0%, rgba(44, 74, 151, 1) 100%);
+  }
+  
+  .graph-container {
+    display: flex;
     justify-content: center;
-    
-    margin-top: 100px;
-};
+    background-color: rgb(213, 207, 207); /* White background for the entire graph container */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow effect */
+  }
+  
+  .graph {
+    width: 70%;
+    margin-top: 20px;
+  }
+  
